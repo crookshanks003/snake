@@ -39,11 +39,25 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+		case "right":
+			m.screen.Snake.ChangeDir(0)
+			return m, nil
+		case "down":
+			m.screen.Snake.ChangeDir(1)
+			return m, nil
+		case "left":
+			m.screen.Snake.ChangeDir(2)
+			return m, nil
+		case "up":
+			m.screen.Snake.ChangeDir(3)
+			return m, nil
 		}
+
 	case TickMsg:
 		m.screen.UpdateSnakePos()
 		return m, tick()
