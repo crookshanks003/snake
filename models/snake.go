@@ -40,7 +40,7 @@ func NewSnake() *Snake {
 		Tail: tail,
 	}
 	head := Node{
-		PosX: 8,
+		PosX: 2,
 		PosY: 1,
 		Dir:  0,
 		Next: &snake.Tail,
@@ -84,4 +84,17 @@ func (s *Snake) ChangeDir(dir int) {
 		Next: &head,
 	}
 	head.Prev = &s.Head
+}
+
+func (s *Snake) BreadEat() {
+	switch s.Tail.Dir {
+	case 0:
+		s.Tail.PosX--
+	case 1:
+		s.Tail.PosY--
+	case 2:
+		s.Tail.PosX++
+	case 3:
+		s.Tail.PosY++
+	}
 }

@@ -3,12 +3,15 @@ package models
 import (
 	"math"
 	"strings"
+
+	"github.com/crookshanks003/snake/cons"
 )
 
 type Screen struct {
 	w     int
 	h     int
 	Snake *Snake
+	Bread *Bread
 	data  [][]rune
 }
 
@@ -23,11 +26,13 @@ func NewScreen(h, w int) Screen {
 		h:     h,
 		w:     w,
 		data:  data,
+		Bread: NewBread(),
 		Snake: NewSnake(),
 	}
 	screen.RenderSpace()
 	screen.RenderBorder()
 	screen.RenderSnake()
+	screen.RenderBread()
 
 	return screen
 }
@@ -83,17 +88,36 @@ func (s *Screen) RenderSnake() {
 	s.data[s.Snake.Head.PosY][s.Snake.Head.PosX] = headRune
 }
 
-func (s *Screen) UpdateSnakePos() {
+func (s *Screen) RenderBread() {
+	s.data[s.Bread.PosY][s.Bread.PosX] = breadRune
+}
+
+func (s *Screen) UpdateSnakePos() (bool, bool) {
 	s.Snake.UpdatePos()
+	snakeBite := s.data[s.Snake.Head.PosY][s.Snake.Head.PosX] == snakeRune
 	s.RenderSpace()
 	s.RenderSnake()
+	s.RenderBread()
+
+	breadEat := s.checkBreadEat()
+
+	if breadEat {
+		s.Snake.BreadEat()
+		s.Bread = NewBread()
+	}
+
+	return breadEat, s.checkBorderCollision() || snakeBite
 }
 
-func render() {
-
+func (s *Screen) checkBreadEat() bool {
+	return s.Snake.Head.PosY == s.Bread.PosY && s.Snake.Head.PosX == s.Bread.PosX
 }
 
-func (s *Screen) Render() string {
+func (s *Screen) checkBorderCollision() bool {
+	return s.Snake.Head.PosX == 0 || s.Snake.Head.PosX == cons.Width-1 || s.Snake.Head.PosY == 0 || s.Snake.Head.PosY == cons.Height-1
+}
+
+func (s *Screen) RenderScreen() string {
 	rowStrings := []string{}
 	for _, row := range s.data {
 		rowStrings = append(rowStrings, string(row))

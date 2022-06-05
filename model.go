@@ -1,20 +1,18 @@
 package main
 
 import (
+	"strconv"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/crookshanks003/snake/cons"
 	"github.com/crookshanks003/snake/models"
 )
-
-const height = 34
-const width = 70
-const fps = 100
 
 type TickMsg time.Time
 
 func tick() tea.Cmd {
-	return tea.Tick(time.Duration(fps)*time.Millisecond, func(t time.Time) tea.Msg {
+	return tea.Tick(time.Duration(cons.Fps)*time.Millisecond, func(t time.Time) tea.Msg {
 		return TickMsg(t)
 	})
 }
@@ -27,7 +25,7 @@ type model struct {
 
 func InitialModel() model {
 	return model{
-		screen:   models.NewScreen(height, width),
+		screen:   models.NewScreen(cons.Height, cons.Width),
 		score:    0,
 		gameOver: false,
 	}
@@ -59,7 +57,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case TickMsg:
-		m.screen.UpdateSnakePos()
+		score, gameOver := m.screen.UpdateSnakePos()
+		if score {
+			m.score++
+		}
+		if gameOver {
+			m.gameOver = true
+			return m, nil
+		}
 		return m, tick()
 	}
 
@@ -67,5 +72,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return m.screen.Render()
+	lastLine := "\nScore: " + strconv.Itoa(m.score)
+	if m.gameOver {
+		lastLine += "\t\t\tGame Over!!"
+	} else {
+		lastLine += "\t\t\t\t"
+	}
+	lastLine += "\t\t     q to quit"
+	return m.screen.RenderScreen() + lastLine
 }

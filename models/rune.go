@@ -13,3 +13,5 @@ const (
 	snakeRune = '#'
 	headRune = '@'
 )
+
+const breadRune = '$'
