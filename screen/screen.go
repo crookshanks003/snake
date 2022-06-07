@@ -1,4 +1,4 @@
-package models
+package screen
 
 import (
 	"math"
@@ -32,7 +32,6 @@ func NewScreen(h, w int) Screen {
 	screen.RenderSpace()
 	screen.RenderBorder()
 	screen.RenderSnake()
-	screen.RenderBread()
 
 	return screen
 }
